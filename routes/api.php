@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController
 use App\Http\Controllers\Api\Admin\CertificateController as AdminCertificateController;
 use App\Http\Controllers\Api\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Api\Admin\PayoutController as AdminPayoutController;
+use App\Http\Controllers\Api\Admin\SettlementController as AdminSettlementController;
 use App\Http\Controllers\Api\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Api\Admin\VendorController as AdminVendorController;
 use App\Http\Controllers\Api\Public\ArticleController;
@@ -30,6 +32,8 @@ use App\Http\Controllers\Api\Vendor\DashboardController as VendorDashboardContro
 use App\Http\Controllers\Api\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Api\Vendor\ProductController as VendorProductController;
 use App\Http\Controllers\Api\Vendor\ServiceController as VendorServiceController;
+use App\Http\Controllers\Api\Vendor\WalletController as VendorWalletController;
+use App\Http\Controllers\Api\Vendor\SettlementController as VendorSettlementController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -97,6 +101,13 @@ Route::prefix('v1')->group(function () {
 
             Route::get('orders', [VendorOrderController::class, 'index']);
             Route::get('dashboard', [VendorDashboardController::class, 'index']);
+            Route::get('wallet', [VendorWalletController::class, 'show']);
+            Route::get('wallet/transactions', [VendorWalletController::class, 'transactions']);
+            Route::get('wallet/accounts', [VendorWalletController::class, 'accounts']);
+            Route::post('wallet/accounts', [VendorWalletController::class, 'storeAccount']);
+            Route::get('wallet/payouts', [VendorWalletController::class, 'payouts']);
+            Route::post('wallet/payouts', [VendorWalletController::class, 'requestPayout']);
+            Route::get('settlements', [VendorSettlementController::class, 'index']);
         });
 
         // ===================== ADMIN (role:admin) =====================
@@ -120,6 +131,13 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('coupons', AdminCouponController::class)->except(['show']);
             Route::apiResource('categories', AdminCategoryController::class)->except(['show']);
             Route::apiResource('articles', AdminArticleController::class)->except(['show']);
+            Route::get('payouts', [AdminPayoutController::class, 'index']);
+            Route::post('payouts/{payoutRequest}/approve', [AdminPayoutController::class, 'approve']);
+            Route::post('payouts/{payoutRequest}/reject', [AdminPayoutController::class, 'reject']);
+            Route::post('payouts/{payoutRequest}/paid', [AdminPayoutController::class, 'markPaid']);
+            Route::get('settlements', [AdminSettlementController::class, 'index']);
+            Route::post('settlements', [AdminSettlementController::class, 'store']);
+            Route::post('settlements/{settlement}/approve', [AdminSettlementController::class, 'approve']);
         });
     });
 });

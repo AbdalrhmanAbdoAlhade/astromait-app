@@ -31,7 +31,7 @@ class PaymentGatewayService
     private string $password;
     private string $returnUrl;
 
-    public function __construct()
+    public function __construct(private readonly WalletService $walletService)
     {
         $this->baseUrl = config('services.edfapay.base_url');
         $this->merchantKey = config('services.edfapay.merchant_key');
@@ -99,6 +99,7 @@ class PaymentGatewayService
         }
 
         $status = $this->mapGatewayStatus($payload['status'] ?? '');
+        $wasPaid = $payment->status === 'paid';
 
         $payment->update([
             'status' => $status,
@@ -108,6 +109,9 @@ class PaymentGatewayService
 
         if ($status === 'paid') {
             $payment->order->update(['status' => 'paid']);
+            if (! $wasPaid) {
+                $this->walletService->recordOrderPaid($payment->order->fresh('items'));
+            }
         }
 
         return $payment->fresh();

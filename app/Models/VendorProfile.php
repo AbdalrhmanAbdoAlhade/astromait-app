@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class VendorProfile extends Model
 {
@@ -64,6 +65,26 @@ class VendorProfile extends Model
     public function coupons(): HasMany
     {
         return $this->hasMany(Coupon::class, 'vendor_id');
+    }
+
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(VendorWallet::class, 'vendor_profile_id');
+    }
+
+    public function payoutAccounts(): HasMany
+    {
+        return $this->hasMany(VendorPayoutAccount::class, 'vendor_profile_id');
+    }
+
+    public function settlements(): HasMany
+    {
+        return $this->hasMany(Settlement::class, 'vendor_profile_id');
+    }
+
+    public function payoutRequests(): HasMany
+    {
+        return $this->hasMany(PayoutRequest::class, 'vendor_profile_id');
     }
 
     public function isApproved(): bool
